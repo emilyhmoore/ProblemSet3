@@ -17,3 +17,20 @@ ymaker(dat.array[,,1]) ##Test function on one dataset
 
 the.yvals<-apply(dat.array, MARGIN=3, FUN=ymaker) ##Apply to all
 dim(the.yvals) ##Check dimensions. Success! 20x1000
+
+##############Problem 3#############
+
+########Function to use in laply below. Allows me to apply over an index
+myfun<-function(i,x,y, coef=TRUE){
+  reg1<-lm(y[,i]~x[,,i]) ##Runs regression on 
+  if(coef==TRUE){return(unname(reg1$coef)) ##Returns coefs if coef==TRUE
+    }else {return(unname(coef(summary(reg1))[,3]))} ##Returns tvals otherwise
+}
+
+##Return regression coefs in matrix
+regressions<-laply(1:1000, .fun=myfun, x=dat.array, y=the.yvals, coef=TRUE)
+dim(regressions) ##Ensure correct dimensions
+
+##Return t-vals in matrix
+tvals<-laply(1:1000, .fun=myfun, x=dat.array, y=the.yvals, coef=FALSE)
+
