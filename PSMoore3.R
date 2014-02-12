@@ -28,8 +28,20 @@ myfun<-function(i,x,y, coef=TRUE){
 }
 
 ##Return regression coefs in matrix
+library(plyr)
 regressions<-laply(1:1000, .fun=myfun, x=dat.array, y=the.yvals, coef=TRUE)
 dim(regressions) ##Ensure correct dimensions
+
+##Function for plotting coefficients
+coefplotter<-function(x){
+  plotdens<-function(x){
+    plot(density(x), main="Coefficient Density")
+  }
+  apply(regressions, 2, plotdens) ##apply over the columns
+}
+par(mfrow=c(1,1)) ##Setting plot window
+coefplotter(regressions) ##Note, It will produce all the plots, but you will 
+##need to scroll through them or use par(mfrow=c(nr, nc)) to view all at once
 
 ##Return t-vals in matrix
 tvals<-laply(1:1000, .fun=myfun, x=dat.array, y=the.yvals, coef=FALSE)
