@@ -2,6 +2,7 @@
 
 ###############Problem 1############
 ##Make 1000 datasets of 20 observations and 5 covariates
+set.seed(12)
 dat<-rnorm(20*5*1000) ##Make random data
 dat.array<-array(dat, dim=c(20,5,1000)) ##Fill data into array
 dim(dat.array) ##Verify dimensions
@@ -11,6 +12,7 @@ Beta <- matrix(c(1,2,0,4,0), ncol=1) ##vector of covariates
 ###############Problem 2############
 ##Create function that multiplies x beta and adds random noise. 
 ymaker<-function(x){
+  set.seed(12)
   (x%*%Beta)+rnorm(20)
 }
 ymaker(dat.array[,,1]) ##Test function on one dataset
@@ -45,4 +47,15 @@ coefplotter(regressions) ##Note, It will produce all the plots, but you will
 
 ##Return t-vals in matrix
 tvals<-laply(1:1000, .fun=myfun, x=dat.array, y=the.yvals, coef=FALSE)
+
+##Function for calculating significance
+sigcalc<-function(x){
+  identify<-function (x){length(which(abs(x)>1.96))}##Minifunction for number sig
+  numbersig<-aaply(x, .margins=2, .fun=identify)##Apply function to each coef
+  names(numbersig)=c("constant", "b1", "b2", "b3", "b4", "b5")##Names for coef
+  return(list(Number_Significant=numbersig, 
+              Percentage_Significant=numbersig/10)) ##Returns list with 
+  ##Number and percentage of t-stats significant for each coef
+}
+sigcalc(tvals) ##Try it out. 
 
