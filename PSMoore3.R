@@ -1,5 +1,13 @@
 ##Problemset 3
 
+###############To Do#####################
+###############Section A, Prob 7
+###############Discuss sambling distribution, t-stat significance
+###############Problem B-1
+###############Problem B-2
+###############Problem B-3
+###############Problem B-4
+
 ###############Problem 1############
 ##Make 1000 datasets of 20 observations and 5 covariates
 set.seed(12)
@@ -58,4 +66,33 @@ sigcalc<-function(x){
   ##Number and percentage of t-stats significant for each coef
 }
 sigcalc(tvals) ##Try it out. 
+
+####################Section B########################
+
+outofstep<-read.table("https://pages.wustl.edu/montgomery/incumbents.txt", header=TRUE)
+missing<-which(is.na(outofstep$voteshare))
+outofstep<-outofstep[-missing,]
+
+set.seed(12)
+outind<-sample(1:6687, size=1000)
+steptest<-outofstep[outind,]
+steptraining<-outofstep[-outind,]
+head(steptraining)
+votemod<-lm(voteshare~year+presvote+inparty
+            +seniority+urban+unemployed, data=steptraining)
+votemod2<-lm(voteshare~year+presvote+inparty*seniority, data=steptraining)
+votemod3<-lm(voteshare~presvote+seniority+urban, data=steptraining)
+naivevote<-lm(voteshare~1, data=steptraining)
+
+predval<-predict(votemod, newdata=steptest)
+predval2<-predict(votemod2,newdata=steptest)
+predval3<-predict(votemod3, newdata=steptest)
+pmat<-cbind(predval, predval2, predval3)
+
+rvec<-predict(naivevote, newdata=steptest)
+
+fitstat<-function(y, p, r){
+  
+}
+
 
