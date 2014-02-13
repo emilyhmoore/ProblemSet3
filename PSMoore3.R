@@ -1,7 +1,6 @@
 ##Problemset 3
 
 ###############To Do#####################
-###############Section A, Prob 7
 ###############Discuss sambling distribution, t-stat significance
 
 ###############Problem 1############
@@ -63,6 +62,16 @@ sigcalc<-function(x){
 }
 sigcalc(tvals) ##Try it out. 
 
+################Part 7##############
+
+system.time(tvals<-laply(1:1000, .fun=myfun, x=dat.array, 
+                         y=the.yvals, coef=FALSE))
+
+library(doMC) ####ONLY WORKS ON MAC!!!!!
+registerDoMC(cores=4)
+system.time(tvals2<-laply(1:1000, .fun=myfun, x=dat.array, 
+                         y=the.yvals, coef=FALSE, .parallel=TRUE))            
+            
 ####################Section B########################
 
 outofstep<-read.table("https://pages.wustl.edu/montgomery/incumbents.txt", header=TRUE)
