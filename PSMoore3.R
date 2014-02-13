@@ -97,8 +97,18 @@ rvec<-predict(naivevote, newdata=steptest)
 
 ##Fit statistics function
 fitstat<-function(y, p){
-  rmse<-function(y,p){sum(abs(p-y)^2)/length(y)}
-  aaply(p,2,rmse, y=y)
+  rmse<-function(y,p){sqrt(sum(abs(p-y)^2))/length(y)}
+  print(aaply(p,2,rmse, y=y))
+  mad<-function(y,p){median(abs(p-y))}
+  print(aaply(p,2, mad, y=y))
+  rmsle<-function(y,p){
+    sqrt(
+      sum(
+      (log(p+1)-log(y+1))^2
+      )
+    )/length(y)
+  }
+  print(aaply(p,2, rmsle, y=y))
 }
 
 fitstat(steptest$voteshare, pmat)
