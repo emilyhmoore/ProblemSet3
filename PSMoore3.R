@@ -70,29 +70,36 @@ sigcalc(tvals) ##Try it out.
 ####################Section B########################
 
 outofstep<-read.table("https://pages.wustl.edu/montgomery/incumbents.txt", header=TRUE)
-missing<-which(is.na(outofstep$voteshare))
-outofstep<-outofstep[-missing,]
+outofstep<-outofstep[,c(2,3,7:19)] ##Dropping variables missing a lot of data
+##As I don't plan to use them
+outofstep<-na.omit(outofstep) ##Omit any cases still missing. Only a couple.
 
 set.seed(12)
-outind<-sample(1:6687, size=1000)
-steptest<-outofstep[outind,]
-steptraining<-outofstep[-outind,]
-head(steptraining)
+outind<-sample(1:6560, size=1000) ##Create sampling index
+steptest<-outofstep[outind,] ##partition out test sample
+steptraining<-outofstep[-outind,] ##rest become training sample
+
+###Models
 votemod<-lm(voteshare~year+presvote+inparty
             +seniority+urban+unemployed, data=steptraining)
-votemod2<-lm(voteshare~year+presvote+inparty*seniority, data=steptraining)
+votemod2<-lm(voteshare~year+presvote+urban+inparty*seniority, data=steptraining)
 votemod3<-lm(voteshare~presvote+seniority+urban, data=steptraining)
 naivevote<-lm(voteshare~1, data=steptraining)
 
+##Predicted values
 predval<-predict(votemod, newdata=steptest)
 predval2<-predict(votemod2,newdata=steptest)
 predval3<-predict(votemod3, newdata=steptest)
 pmat<-cbind(predval, predval2, predval3)
 
+##vector of naive predicted values
 rvec<-predict(naivevote, newdata=steptest)
 
-fitstat<-function(y, p, r){
-  
+##Fit statistics function
+fitstat<-function(y, p){
+  rmse<-function(y,p){sum(abs(p-y)^2)/length(y)}
+  aaply(p,2,rmse, y=y)
 }
 
+fitstat(steptest$voteshare, pmat)
 
