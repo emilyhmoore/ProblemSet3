@@ -2,6 +2,7 @@
 
 ###############Problem 1############
 ##Make 1000 datasets of 20 observations and 5 covariates
+library(plyr)
 set.seed(12)
 dat<-rnorm(20*5*1000) ##Make random data
 dat.array<-array(dat, dim=c(20,5,1000)) ##Fill data into array
@@ -93,7 +94,7 @@ registerDoMC(cores=4) ##Four cores
 system.time(tvals2<-laply(1:1000, .fun=myfun, x=dat.array, 
                          y=the.yvals, coef=FALSE, .parallel=TRUE))            
 
-
+##user and system time is much higher, but elapsed time is cut in half. 
 ####################Section B########################
 
 outofstep<-read.table("https://pages.wustl.edu/montgomery/incumbents.txt", header=TRUE)
