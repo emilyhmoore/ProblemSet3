@@ -3,10 +3,6 @@
 ###############To Do#####################
 ###############Section A, Prob 7
 ###############Discuss sambling distribution, t-stat significance
-###############Problem B-1
-###############Problem B-2
-###############Problem B-3
-###############Problem B-4
 
 ###############Problem 1############
 ##Make 1000 datasets of 20 observations and 5 covariates
@@ -96,33 +92,76 @@ pmat<-cbind(predval, predval2, predval3)
 rvec<-predict(naivevote, newdata=steptest)
 
 ##Fit statistics function
-fitstat<-function(y, p, r){
+fitstat<-function(y, p, r, s.rmse=TRUE, s.mad=TRUE, s.rmsle=TRUE, 
+                  s.mape=TRUE, s.meape=TRUE, s.mrae=TRUE){
+  ##Takes square root of the sum of squared error and divides by n
   rmse<-function(y,p){sqrt(sum(abs(p-y)^2))/length(y)}
-  print(aaply(p,2,rmse, y=y))
-  
+  ##Applies internal function across the columns of p
+  rmse1<-(aaply(p,2,rmse, y=y))
+  ##takes median error
   mad<-function(y,p){median(abs(p-y))}
-  print(aaply(p,2, mad, y=y))
-  
+  ##applies across columns of p
+  mad1<-(aaply(p,2, mad, y=y))
+  ##takes the square root of the sum of the log of predicted values +1
+  ##-the log of the observed values+1 squared then divides by n
   rmsle<-function(y,p){
-    sqrt(
-      sum(
-      (log(p+1)-log(y+1))^2
-      )
-    )/length(y)
+    sqrt(sum((log(p+1)-log(y+1))^2))/length(y)
   }
-  print(aaply(p,2, rmsle, y=y))
-  
+  ##Applies to columns of p
+  rmsle1<-(aaply(p,2, rmsle, y=y))
+  ##Calculates average percentage error
   mape<-function(y,p){sum(((abs(p-y)/abs(y))*100))/length(y)}
-  print(aaply(p,2,mape,y=y))
-  
+  mape1<-(aaply(p,2,mape,y=y))
+  ##calculates median percentage error
   meape<-function(y,p){median((abs(p-y)/abs(y))*100)}
-  print(aaply(p,2,meape, y=y))
-  
+  meape1<-(aaply(p,2,meape, y=y))
+  ##calculates median error over null model error
   mrae<-function(y,p,r){
     b<-abs(r-y)
     median(abs(p-y)/b)}
-  
-  print(aaply(p,2,mrae, y=y, r=r))
+  mrae1<-(aaply(p,2,mrae, y=y, r=r))
+  ##construct matrix with values
+  fitmat<-rbind(rmse1, mad1, rmsle1, mape1, meape1, mrae1)
+  ##transpose to have columns be fit stats
+  fitmat<-t(fitmat)
+  ##create index to be used in display options. Negative columns will be 
+  ##ommitted when it's time to return the matrix. 
+  index<-NULL
+  if(s.rmse==FALSE){index[1]=-1}
+  if(s.mad==FALSE){index[2]=-2}
+  if(s.rmsle==FALSE){index[3]=-3}
+  if(s.mape==FALSE){index[4]=-4}
+  if(s.meape==FALSE){index[5]=-5}
+  if(s.mrae==FALSE){index[6]==-6}
+  ##Returns index of everything if default is followed
+  if(all(s.rmse,s.mad,s.rmsle,s.mape,s.meape,
+         s.mrae)==TRUE){index<-c(1:6)}
+  index<-na.omit(index) ##Needed for index to work properly. Otherwise NAs if
+  ##one of the stat options is TRUE
+  return(fitmat[,index])
 }
-
 fitstat(steptest$voteshare, pmat, rvec)
+fitstat(steptest$voteshare, pmat, rvec, s.mrae=FALSE) ##Testing to ensure
+##function works omitting mrae
+fitstat(steptest$voteshare, pmat, rvec, s.mad=FALSE, s.meape=FALSE)##Testing 
+##to see if the function still works without multiple stats
+
+##############Part B-4####################
+####The models are pretty good (and pretty similar in terms of fit).
+####All of the stats would be 0 if the model predicted perfectly.
+####All of these values are quite low, which bodes well
+####For my constructed models. Unfortunately, the average percentage of
+####error is at 11 percent. While this could be much lower, 11 percent
+####is not all that high considering that percentage error has no
+####upper limit. Similarly, meape is pretty low. The most highly 
+####specified model actually has the lowest meape. 
+####In practice, it seems that one would want an MRAE of 0, but in the
+####absence of perfect estimate, one would prefer the value to be lower than 
+####one. This is because a value of 1 would mean that the specified model
+####has the same amount of error (no greater predictive power) than
+####A null model (in this case just a constant). If the specified model
+####has lower error than the null model, the MRAE value will be less than one.
+####We find that happens here, though I am not familiar enough with standard
+####practices in regards to MRAE to know what to expect out of a reasonably
+####good model. 
+
