@@ -96,11 +96,13 @@ pmat<-cbind(predval, predval2, predval3)
 rvec<-predict(naivevote, newdata=steptest)
 
 ##Fit statistics function
-fitstat<-function(y, p){
+fitstat<-function(y, p, r){
   rmse<-function(y,p){sqrt(sum(abs(p-y)^2))/length(y)}
   print(aaply(p,2,rmse, y=y))
+  
   mad<-function(y,p){median(abs(p-y))}
   print(aaply(p,2, mad, y=y))
+  
   rmsle<-function(y,p){
     sqrt(
       sum(
@@ -109,7 +111,18 @@ fitstat<-function(y, p){
     )/length(y)
   }
   print(aaply(p,2, rmsle, y=y))
+  
+  mape<-function(y,p){sum(((abs(p-y)/abs(y))*100))/length(y)}
+  print(aaply(p,2,mape,y=y))
+  
+  meape<-function(y,p){median((abs(p-y)/abs(y))*100)}
+  print(aaply(p,2,meape, y=y))
+  
+  mrae<-function(y,p,r){
+    b<-abs(r-y)
+    median(abs(p-y)/b)}
+  
+  print(aaply(p,2,mrae, y=y, r=r))
 }
 
-fitstat(steptest$voteshare, pmat)
-
+fitstat(steptest$voteshare, pmat, rvec)
