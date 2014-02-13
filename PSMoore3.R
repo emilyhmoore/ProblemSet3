@@ -1,8 +1,5 @@
 ##Problemset 3
 
-###############To Do#####################
-###############Discuss sambling distribution, t-stat significance
-
 ###############Problem 1############
 ##Make 1000 datasets of 20 observations and 5 covariates
 set.seed(12)
@@ -43,12 +40,20 @@ coefplotter<-function(x){
   plotdens<-function(x){
     plot(density(x), main="Coefficient Density")
   }
-  apply(regressions, 2, plotdens) ##apply over the columns
+  a_ply(regressions, 2, plotdens) ##apply over the columns
 }
 par(mfrow=c(1,1)) ##Setting plot window
 coefplotter(regressions) ##Note, It will produce all the plots, but you will 
 ##need to scroll through them or use par(mfrow=c(nr, nc)) to view all at once
 
+######This represents the sampling distribution of the coefficients.
+######It notes that for some coefficients, the two are clearly related and
+######So for these coefficients, the effect is centered around the "true"
+######value of the coefficient. The concern with error here is getting a false
+######negative...that once in a while one may find that this coefficient
+######is not significant when it really is. Conversely, some of the effects
+######are centered around their true effect at 0 and have the possibility
+######of getting a false positive error. 
 #############Problem 5##################
 ##Return t-vals in matrix
 tvals<-laply(1:1000, .fun=myfun, x=dat.array, y=the.yvals, coef=FALSE)
@@ -64,6 +69,18 @@ sigcalc<-function(x){
   ##Number and percentage of t-stats significant for each coef
 }
 sigcalc(tvals) ##Try it out. 
+
+#####For this seed, about 7.7 and 6.7 percent of b3 and b5 (respectively) are 
+#####Significant even though the true value was zero. We expect this to be
+#####around 5 percent. We should see that with repeated sampling of the 
+#####t distributions of coefficients it will approach 5 percent.
+#####In other words, we expect a coefficient to be signfiicant by chance
+#####around 5 percent of the time when it truly has no effect. 
+#####On the other hand b2 and b4 were significant 100 percent of the time.
+#####However, the effect may be over or under estimated as shown in the
+#####sampling distribution of the coefficients. The "true" values should
+#####be 2 and 4. On the other hand, B1 is given a false negative about 2.7
+#####percent of the time. 
 
 ################Problem 7##############
 
@@ -146,7 +163,7 @@ fitstat<-function(y, p, r, s.rmse=TRUE, s.mad=TRUE, s.rmsle=TRUE,
   if(s.rmsle==FALSE){index[3]=-3}
   if(s.mape==FALSE){index[4]=-4}
   if(s.meape==FALSE){index[5]=-5}
-  if(s.mrae==FALSE){index[6]==-6}
+  if(s.mrae==FALSE){index[6]=-6}
   ##Returns index of everything if default is followed
   if(all(s.rmse,s.mad,s.rmsle,s.mape,s.meape,
          s.mrae)==TRUE){index<-c(1:6)}
