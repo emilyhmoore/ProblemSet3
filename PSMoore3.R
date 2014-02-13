@@ -37,6 +37,7 @@ library(plyr)
 regressions<-laply(1:1000, .fun=myfun, x=dat.array, y=the.yvals, coef=TRUE)
 dim(regressions) ##Ensure correct dimensions
 
+###############Problem 4###################
 ##Function for plotting coefficients
 coefplotter<-function(x){
   plotdens<-function(x){
@@ -48,9 +49,11 @@ par(mfrow=c(1,1)) ##Setting plot window
 coefplotter(regressions) ##Note, It will produce all the plots, but you will 
 ##need to scroll through them or use par(mfrow=c(nr, nc)) to view all at once
 
+#############Problem 5##################
 ##Return t-vals in matrix
 tvals<-laply(1:1000, .fun=myfun, x=dat.array, y=the.yvals, coef=FALSE)
 
+#############Problem6###################
 ##Function for calculating significance
 sigcalc<-function(x){
   identify<-function (x){length(which(abs(x)>1.96))}##Minifunction for number sig
@@ -62,16 +65,18 @@ sigcalc<-function(x){
 }
 sigcalc(tvals) ##Try it out. 
 
-################Part 7##############
+################Problem 7##############
 
 system.time(tvals<-laply(1:1000, .fun=myfun, x=dat.array, 
-                         y=the.yvals, coef=FALSE))
+                         y=the.yvals, coef=FALSE)) 
+##Look at system time of above code
 
-library(doMC) ####ONLY WORKS ON MAC!!!!!
-registerDoMC(cores=4)
+library(doMC) ####ONLY WORKS ON MAC!!!!! Make sure this is installed!!!
+registerDoMC(cores=4) ##Four cores
 system.time(tvals2<-laply(1:1000, .fun=myfun, x=dat.array, 
                          y=the.yvals, coef=FALSE, .parallel=TRUE))            
-            
+
+
 ####################Section B########################
 
 outofstep<-read.table("https://pages.wustl.edu/montgomery/incumbents.txt", header=TRUE)
